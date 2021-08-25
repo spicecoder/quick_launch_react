@@ -7,7 +7,7 @@ const Cards = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const pages = new Array(numberOfPages).fill(null).map((v, i) => i);
   useEffect(() => {
-    fetch(`http://localhost:9000/posts?page=${pageNumber}`)
+    fetch(`http://localhost:8000/posts?page=${pageNumber}`)
       .then((response) => response.json())
       .then(({ totalPages, posts }) => {
         setCards(posts);

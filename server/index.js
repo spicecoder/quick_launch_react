@@ -5,7 +5,7 @@ var database;
 const app = Express();
 app.use(cors());
 app.use(Express.json());
-const PORT = 9000;
+const PORT = 8000;
 
 app.get("/posts", async (req, res) => {
   const Post = database.collection("post");
