@@ -1,45 +1,47 @@
 import { useEffect, useState } from "react";
-import ReactPaginate from "react-paginate";
 import "./index.css";
 
 const Cards = () => {
   const [card, setCards] = useState([]);
+  const [numberOfPages, setNumberOfPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(0);
-  const usersPerPage = 10;
-  const pagesVisited = pageNumber * usersPerPage;
-  const pageCount = Math.ceil(card.length / usersPerPage);
-
-  const changePage = ({ selected }) => {
-    setPageNumber(selected);
-  };
+  const pages = new Array(numberOfPages).fill(null).map((v, i) => i);
   useEffect(() => {
-    fetch("https://api.github.com/users")
+    fetch(`http://localhost:9000/posts?page=${pageNumber}`)
       .then((response) => response.json())
-      .then((json) => setCards(json));
-  }, []);
+      .then(({ totalPages, posts }) => {
+        setCards(posts);
+        setNumberOfPages(totalPages);
+      });
+  }, [pageNumber]);
+
+  const gotoPrevious = () => {
+    setPageNumber(Math.max(0, pageNumber - 1));
+  };
+
+  const gotoNext = () => {
+    setPageNumber(Math.min(numberOfPages - 1, pageNumber + 1));
+  };
   return (
     <div style={{ marginTop: "50px" }}>
       <div className="cards">
-        {card.slice(pagesVisited, pagesVisited + usersPerPage).map((cd) => (
-          <div className="card">
-            <img className="avatar" src={cd.avatar_url} alt="avatar" />
-            <div className="user-data">
-              <h4 style={{ paddingLeft: "10px" }}>{cd.login}</h4>
-            </div>
+        {card.map((cd) => (
+          <div className="post">
+            <small>{cd.id}</small>
+            <h1>{cd.title}</h1>
+            <p>{cd.body}</p>
           </div>
         ))}
       </div>
-      <ReactPaginate
-        previousLabel={"Previous"}
-        nextLabel={"Next"}
-        pageCount={pageCount}
-        onPageChange={changePage}
-        containerClassName={"paginationBttns"}
-        previousLinkClassName={"previousBttn"}
-        nextLinkClassName={"nextBttn"}
-        disabledClassName={"paginationDisabled"}
-        activeClassName={"paginationActive"}
-      />
+      <div style={{ width: "300px", margin: "auto", marginBottom: "50px" }}>
+        <button onClick={gotoPrevious}>Previous</button>
+        {pages.map((pageIndex) => (
+          <button key={pageIndex} onClick={() => setPageNumber(pageIndex)}>
+            {pageIndex + 1}
+          </button>
+        ))}
+        <button onClick={gotoNext}>Next</button>
+      </div>
     </div>
   );
 };
